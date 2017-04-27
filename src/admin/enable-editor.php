@@ -23,7 +23,7 @@ add_action('edit_form_after_title', __NAMESPACE__ . '\enable_page_for_posts_edit
  * @return void
  */
 function enable_page_for_posts_editor( $post ) {
-	if ( get_option( 'page_for_posts' ) === $post->ID ) {
+	if ( get_option( 'page_for_posts' ) == $post->ID ) {
 		add_post_type_support( 'page', 'editor' );
 	}
 }
