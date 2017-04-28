@@ -14,7 +14,18 @@
 
 namespace BlogIntro;
 
-//add_action( 'genesis_before_loop', 'genesis_do_posts_page_heading' );
+add_action( 'after_setup_theme', __NAMESPACE__ . '\unregister_callbacks');
+/**
+ * Unregister callbacks after they have been registered
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function unregister_callbacks() {
+	remove_action( 'genesis_before_loop', 'genesis_do_posts_page_heading' );
+}
+
 add_action( 'genesis_before_loop', __NAMESPACE__ . '\render_content' );
 /**
  * Display the content for the posts page.
@@ -32,7 +43,10 @@ function render_content() {
 		return;
 	}
 
-	echo $posts_page->post_content;
+	$contents = prepare_contents_for_rendering( $posts_page->post_content );
+	$title = esc_html( $posts_page->post_title );
+
+	include( 'views/contents.php' );
 }
 
 /**
@@ -46,4 +60,20 @@ function get_posts_page() {
 	$posts_page_id = get_option( 'page_for_posts' );
 
 	return get_post( $posts_page_id );
+}
+
+/**
+ * Prepare raw content from database for rendering
+ *
+ * @since 1.0.0
+ *
+ * @param string $post_content
+ *
+ * @return string Returns HTML
+ */
+function prepare_contents_for_rendering( $post_content ) {
+	$post_content = wp_kses_post( $post_content );
+	$post_content = do_shortcode( $post_content );
+
+	return wpautop( $post_content );
 }
